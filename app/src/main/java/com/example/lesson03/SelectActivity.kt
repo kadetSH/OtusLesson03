@@ -1,4 +1,6 @@
 package com.example.lesson03
 
-class SelectActivity {
+import androidx.appcompat.app.AppCompatActivity
+
+class SelectActivity : AppCompatActivity(){
 }
