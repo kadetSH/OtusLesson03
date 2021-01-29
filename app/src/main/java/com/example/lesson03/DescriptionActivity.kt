@@ -1,10 +1,14 @@
 package com.example.lesson03
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 class DescriptionActivity : AppCompatActivity() {
@@ -39,12 +43,11 @@ class DescriptionActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        println("")
 
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("nameOfDescription", nameFilm)
 
-            var value = ""
+            var value : String = ""
             if (findViewById<CheckBox>(R.id.likeId).isChecked) {
                 value = "Нравится"
             } else {
@@ -56,8 +59,10 @@ class DescriptionActivity : AppCompatActivity() {
             putExtra("comment", comment)
 
         }
-        this.startActivity(intent)
+
     }
+
+
 
 
 }

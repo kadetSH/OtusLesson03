@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Lesson03</string>
+    <string name="butDetails">Детали</string>
+    <string name="butShare">Пригласить друга</string>
+    <string name="butAdd" translatable="false">Добавить</string>
+    <string name="butFavorites" translatable="false">Любимые</string>
+    <string name="butDell" translatable="false">Удалить</string>
 </resources>
