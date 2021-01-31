@@ -4,27 +4,21 @@ package com.example.lesson03
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.TypedArray
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import androidx.core.view.size
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.navigation.NavigationView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.template.view.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -106,6 +100,12 @@ class MainActivity : AppCompatActivity() {
         }
         /////////////////////////
 
+        //Удалить вручную фильм
+        butDell.setOnClickListener {
+            clickDellFilm()
+        }
+        /////////////////////////
+
 
         //массивы по фильмам отправляем в функцию для заполнения массива шаблонов
         list.addAll(
@@ -131,6 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clickAddFilm() {
+
         var count = list.size
 
         var spisokItem = SpisokItem(
@@ -142,6 +143,14 @@ class MainActivity : AppCompatActivity() {
         list.add(spisokItem)
         spisokFull.adapter?.notifyItemInserted(count)
 
+    }
+
+    private fun clickDellFilm() {
+
+        var count = list.size-1
+
+        list.removeAt(count)
+        spisokFull.adapter?.notifyItemRemoved(count)
 
     }
 
@@ -198,7 +207,8 @@ class MainActivity : AppCompatActivity() {
             spisokItem.star = true
             starSpisok.add(spisokItem.nameFilm)
             starSpisokPosition.add(position)
-            colorStar(spisokItem, position)
+//            colorStar(spisokItem, position)
+            adapter?.notifyItemChanged(position)
         }
         if ((spisokItem.star == true) && (proverka == false)) {
             proverka = true
@@ -207,7 +217,8 @@ class MainActivity : AppCompatActivity() {
             starSpisok.removeAt(indexName)
             var indexPosition = starSpisokPosition.indexOf(position)
             starSpisokPosition.removeAt(indexPosition)
-            colorStar(spisokItem, position)
+//            colorStar(spisokItem, position)
+            adapter?.notifyItemChanged(position)
         }
 
     }
@@ -236,8 +247,6 @@ class MainActivity : AppCompatActivity() {
 
     fun favoritesOnClick() {
 
-
-
         if ((starSpisok.size == 0) && (favoriteName.size == 0)){
             Toast.makeText(baseContext, "Нет помеченных фильмов", Toast.LENGTH_SHORT).show()
             }
@@ -252,8 +261,6 @@ class MainActivity : AppCompatActivity() {
                             starSpisokPosition.add(namPos)
                         }
                     }
-
-
             }
             val intent = Intent(baseContext, FavoritesActivity::class.java).apply {
                 putExtra("starSpisokPosition", starSpisokPosition)
@@ -261,27 +268,18 @@ class MainActivity : AppCompatActivity() {
             baseContext.startActivity(intent)
         }
 
-
-//        if (starSpisok.size == 0) {
-//            Toast.makeText(baseContext, "Нет помеченных фильмов", Toast.LENGTH_SHORT).show()
-//        } else {
-//            val intent = Intent(baseContext, FavoritesActivity::class.java).apply {
-//                putExtra("starSpisokPosition", starSpisokPosition)
-//            }
-//            baseContext.startActivity(intent)
-//        }
     }
 
     fun initRecycler() {
-        val layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, false)
-        spisokFull.layoutManager = layoutManager
-
+//        val layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, false)
         adapter = MyAdapter(list, this) { spisokItem: SpisokItem, position: Int ->
-//            println("")
             selectFavorites(spisokItem, position)
         }
+
+        spisokFull.addItemDecoration(Decor(22))
         spisokFull.adapter = adapter
 
+        
     }
 
 

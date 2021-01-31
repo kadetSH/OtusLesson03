@@ -6,9 +6,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.text.Annotation
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,6 +21,8 @@ import androidx.core.graphics.toColor
 import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.animation.AnimationUtils
+import com.google.android.material.animation.AnimationUtils.DECELERATE_INTERPOLATOR
 import kotlinx.android.synthetic.main.activity_favorites.*
 
 
@@ -56,8 +60,10 @@ class MyAdapter(spisokArray: ArrayList<SpisokItem>, context: Context, private va
 
             val colorTrue = ContextCompat.getColor(context, R.color.starTrue)
             val colorFalse = ContextCompat.getColor(context, R.color.starFalse)
-            star.isSelected
+//            star.isSelected
             if (star.isSelected == true){
+                var starAnim = android.view.animation.AnimationUtils.loadAnimation(context, R.anim.scale_star)
+                star.startAnimation(starAnim)
                 star.setBackgroundColor(colorTrue)
             }else star.setBackgroundColor(colorFalse)
 
@@ -87,6 +93,9 @@ class MyAdapter(spisokArray: ArrayList<SpisokItem>, context: Context, private va
 
             star.setOnClickListener {
 //                Toast.makeText(context, "нажали", Toast.LENGTH_SHORT).show()
+                var starAnim = android.view.animation.AnimationUtils.loadAnimation(context, R.anim.scale_star)
+
+                star.startAnimation(starAnim)
 
                 var colorDraw = star.background?.mutate()
                 colorDraw?.let {
@@ -97,11 +106,13 @@ class MyAdapter(spisokArray: ArrayList<SpisokItem>, context: Context, private va
                 if (colorDraw == null){
                     star.setBackgroundColor(colorTrue)
                 }
+
 //
 //                val rr = fullSpisok?.getChildAdapterPosition(it)
 //
 //                println("")
             }
+
 
 
         }
