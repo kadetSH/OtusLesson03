@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
         list.removeAt(count)
         spisokFull.adapter?.notifyItemRemoved(count)
-
+//1
     }
 
 
