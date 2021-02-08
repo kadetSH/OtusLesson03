@@ -2,7 +2,12 @@
     <string name="app_name">Lesson03</string>
     <string name="butDetails">Детали</string>
     <string name="butShare">Пригласить друга</string>
+    <string name="title" translatable="false">Фильмы</string>
+    <string name="title_favorite" translatable="false">Фавориты</string>
     <string name="butAdd" translatable="false">Добавить</string>
     <string name="butFavorites" translatable="false">Любимые</string>
     <string name="butDell" translatable="false">Удалить</string>
+    <string name="title_main_activity" translatable="false">Фильмы</string>
+    <string name="title_favorites_activity" translatable="false">Фавориты</string>
+
 </resources>

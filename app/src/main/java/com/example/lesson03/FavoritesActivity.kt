@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.internal.ContextUtils.getActivity
 import kotlinx.android.synthetic.main.activity_favorites.*
 import kotlinx.android.synthetic.main.template.view.*
 
@@ -37,7 +38,7 @@ class FavoritesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
 
-        setTitle("Фавориты")
+        setTitle(resources.getString(R.string.title_favorite))
 
         starSpisokPosition = intent.getIntegerArrayListExtra("starSpisokPosition") as ArrayList<Int>
         colorFalse = ContextCompat.getColor(baseContext, R.color.starFalse)
@@ -53,8 +54,6 @@ class FavoritesActivity : AppCompatActivity() {
             )
         )
         initRecycler(list)
-
-
     }
 
 
@@ -69,9 +68,6 @@ class FavoritesActivity : AppCompatActivity() {
             for (pos in it) {
                 var shortDescription = descriptionArray[pos]
                 var proverka = ""
-//            if (titleArray[i].equals(filmP)){
-//                proverka = filmP
-//            }
 
                 var spisokItem = SpisokItem(
                     titleArray[pos], filmImageArray[pos], shortDescription.substring(
@@ -102,7 +98,6 @@ class FavoritesActivity : AppCompatActivity() {
         favoritesSpisok.layoutManager = layoutManager
 
         adapter = MyAdapter(list, this) { spisokItem: SpisokItem, position: Int ->
-            println("")
             colorStarDellFavorite(position)
         }
         favoritesSpisok.adapter = adapter
@@ -114,14 +109,12 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-
-        currentFocus?.let { exitDialog(it) }
-
+        exitDialog(spisokFullFavorites)
+//        currentFocus?.let { exitDialog(it) }
     }
 
     fun exitDialog(view : View){
         val alertD : AlertDialog.Builder = AlertDialog.Builder(this)
-
         val listenerCancel = DialogInterface.OnClickListener { dialog, which ->
             Toast.makeText(this, "Нет", Toast.LENGTH_LONG).show()
         }

@@ -7,6 +7,7 @@ import android.content.res.TypedArray
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -26,9 +27,6 @@ class MainActivity : AppCompatActivity() {
     var adapter: MyAdapter? = null
     var filmP: String = ""
     private val TAG = "myLogs"
-//    private val nameFilmPole by lazy {
-//        findViewById<TextView>(R.id.nameFilm)
-//    }
 
     val spisokFull by lazy {
         findViewById<RecyclerView>(R.id.spisok)
@@ -54,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     var list = ArrayList<SpisokItem>()
     var colorTrue: Int? = null
     var colorFalse: Int? = null
-    var favoriteName : ArrayList<String> = ArrayList()
+    var favoriteName: ArrayList<String> = ArrayList()
 
 
     @SuppressLint("ResourceAsColor")
@@ -63,8 +61,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_films)
         colorFalse = ContextCompat.getColor(baseContext, R.color.starFalse)
         colorTrue = ContextCompat.getColor(baseContext, R.color.starTrue)
-
-        setTitle("Фильмы")
+        setTitle(resources.getString(R.string.title))
 
         //Получаем названия фильма после возвращения с описания
         val name = intent.getStringExtra("nameOfDescription")
@@ -73,11 +70,13 @@ class MainActivity : AppCompatActivity() {
         }/////////
 
         //Получаем названия фильмов после возвращения из фаворитов
-        val getfavoriteName   = intent.getStringArrayListExtra("favoriteList")
+        val getfavoriteName = intent.getStringArrayListExtra("favoriteList")
         getfavoriteName?.let {
             favoriteName = it
+            if (favoriteName.size > 0){
+                starSpisok = it
+            }
         }
-
 
         val like = intent.getStringExtra("like")
         like?.let {
@@ -90,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
         //Выводим список любимых фильмов
         butFavorites.setOnClickListener {
-            favoritesOnClick()
+            favoritesOnClick(it)
         }
         ////////////////////////////
 
@@ -122,18 +121,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<RecyclerView>(R.id.spisok).hasFixedSize()
         findViewById<RecyclerView>(R.id.spisok).layoutManager = LinearLayoutManager(this)
         initRecycler()
-//        adapter = MyAdapter(list, this) { spisokItem: SpisokItem, position: Int ->
-//            selectFavorites(spisokItem, position)
-//        }
-//        spisokFull.adapter = adapter
-
-
     }
 
     private fun clickAddFilm() {
-
         var count = list.size
-
         var spisokItem = SpisokItem(
             "Добавили фильм $count",
             R.drawable.ic_launcher_foreground,
@@ -142,18 +133,13 @@ class MainActivity : AppCompatActivity() {
             false)
         list.add(spisokItem)
         spisokFull.adapter?.notifyItemInserted(count)
-
     }
 
     private fun clickDellFilm() {
-
-        var count = list.size-1
-
+        var count = list.size - 1
         list.removeAt(count)
         spisokFull.adapter?.notifyItemRemoved(count)
-
     }
-
 
     fun fillArrays(
         titleArray: Array<String>,
@@ -168,11 +154,11 @@ class MainActivity : AppCompatActivity() {
                 proverka = filmP
             }
             var idxFav = favoriteName.indexOf(titleArray[i])
-            var boolFavorite : Boolean
+            var boolFavorite: Boolean
 
             if (idxFav == -1) {
                 boolFavorite = false
-            }else{
+            } else {
                 boolFavorite = true
             }
             var spisokItem = SpisokItem(
@@ -207,17 +193,15 @@ class MainActivity : AppCompatActivity() {
             spisokItem.star = true
             starSpisok.add(spisokItem.nameFilm)
             starSpisokPosition.add(position)
-//            colorStar(spisokItem, position)
             adapter?.notifyItemChanged(position)
         }
         if ((spisokItem.star == true) && (proverka == false)) {
             proverka = true
             spisokItem.star = false
             var indexName = starSpisok.indexOf(spisokItem.nameFilm)
-            starSpisok.removeAt(indexName)
+            if (indexName > -1) starSpisok.removeAt(indexName)
             var indexPosition = starSpisokPosition.indexOf(position)
-            starSpisokPosition.removeAt(indexPosition)
-//            colorStar(spisokItem, position)
+            if (indexPosition > -1) starSpisokPosition.removeAt(indexPosition)
             adapter?.notifyItemChanged(position)
         }
 
@@ -228,9 +212,6 @@ class MainActivity : AppCompatActivity() {
         var selectItem = spisokFull.getChildAt(position).idStar
         var colorDraw = selectItem?.background?.mutate()
 
-
-//        var selectItem = spisokFull.get(position).idStar
-//        var colorDraw = selectItem.idStar.background?.mutate()
         colorDraw?.let {
             var intColorDraw = (it as ColorDrawable).color
             if (intColorDraw == colorFalse) colorTrue?.let { it1 ->
@@ -245,42 +226,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun favoritesOnClick() {
+    fun favoritesOnClick(view: View) {
 
-        if ((starSpisok.size == 0) && (favoriteName.size == 0)){
+        if ((starSpisok.size == 0) && (favoriteName.size == 0)) {
             Toast.makeText(baseContext, "Нет помеченных фильмов", Toast.LENGTH_SHORT).show()
-            }
-        else{
+        } else {
             var spisokFilm = resources.getStringArray(R.array.film)
 
-            for (favorName in favoriteName){
-                    var namPos = spisokFilm.indexOf(favorName)
-                    if (namPos > -1){
-                        var proverka = starSpisokPosition.indexOf(namPos)
-                        if (proverka == -1){
-                            starSpisokPosition.add(namPos)
-                        }
+            for (favorName in favoriteName) {
+                var namPos = spisokFilm.indexOf(favorName)
+                if (namPos > -1) {
+                    var proverka = starSpisokPosition.indexOf(namPos)
+                    if (proverka == -1) {
+                        starSpisokPosition.add(namPos)
                     }
+                }
             }
-            val intent = Intent(baseContext, FavoritesActivity::class.java).apply {
+            val intent = Intent(this, FavoritesActivity::class.java).apply {
                 putExtra("starSpisokPosition", starSpisokPosition)
             }
-            baseContext.startActivity(intent)
+            startActivity(intent)
+//            val intent = Intent(baseContext, FavoritesActivity::class.java).apply {
+//                putExtra("starSpisokPosition", starSpisokPosition)
+//            }
+//            baseContext.startActivity(intent)
         }
-
     }
 
     fun initRecycler() {
-//        val layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, false)
         adapter = MyAdapter(list, this) { spisokItem: SpisokItem, position: Int ->
             selectFavorites(spisokItem, position)
         }
-
         spisokFull.addItemDecoration(Decor(22))
         spisokFull.adapter = adapter
 
-        
     }
-
-
 }

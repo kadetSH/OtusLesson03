@@ -37,8 +37,6 @@ class DescriptionActivity : AppCompatActivity() {
                 R.drawable.ic_launcher_foreground
             )
         )
-
-
     }
 
     override fun onBackPressed() {
@@ -46,8 +44,8 @@ class DescriptionActivity : AppCompatActivity() {
 
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("nameOfDescription", nameFilm)
-
             var value : String = ""
+
             if (findViewById<CheckBox>(R.id.likeId).isChecked) {
                 value = "Нравится"
             } else {
@@ -57,12 +55,6 @@ class DescriptionActivity : AppCompatActivity() {
 
             val comment = findViewById<TextView>(R.id.comentId).text.toString()
             putExtra("comment", comment)
-
         }
-
     }
-
-
-
-
 }
