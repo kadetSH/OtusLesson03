@@ -207,25 +207,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun colorStar(spisokItem: SpisokItem, position: Int) {
-        var count = spisokFull.size
-        var selectItem = spisokFull.getChildAt(position).idStar
-        var colorDraw = selectItem?.background?.mutate()
-
-        colorDraw?.let {
-            var intColorDraw = (it as ColorDrawable).color
-            if (intColorDraw == colorFalse) colorTrue?.let { it1 ->
-                selectItem.setBackgroundColor(it1)
-            }
-            if ((intColorDraw == colorTrue)) colorFalse?.let { it1 ->
-                selectItem.setBackgroundColor(it1)
-            }
-        }
-        if (colorDraw == null) {
-            colorTrue?.let { star.setBackgroundColor(it) }
-        }
-    }
-
     fun favoritesOnClick(view: View) {
 
         if ((starSpisok.size == 0) && (favoriteName.size == 0)) {
@@ -242,6 +223,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            super.finish()
             val intent = Intent(this, FavoritesActivity::class.java).apply {
                 putExtra("starSpisokPosition", starSpisokPosition)
             }
