@@ -1,12 +1,11 @@
-package com.example.lesson03
+package com.example.lesson03.recyclerMy
 
-import android.widget.Button
-import android.widget.ImageView
+import java.io.Serializable
 
-data class SpisokItem(
+data class FilmsItem(
     var nameFilm : String,
     var imageFilm : Int,
     var shortDescription : String,
     var proverka : String,
     var star : Boolean
-)
+) : Serializable
