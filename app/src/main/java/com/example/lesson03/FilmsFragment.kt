@@ -31,6 +31,10 @@ class FilmsFragment : Fragment() {
     var filmP: String = ""
     var favoriteName: ArrayList<String> = ArrayList()
 
+    val rcv by lazy {
+        view?.findViewById<RecyclerView>(R.id.id_recyclerView)
+    }
+
 
 
 
@@ -60,6 +64,7 @@ class FilmsFragment : Fragment() {
 
         list = arguments?.getSerializable("spisok") as ArrayList<FilmsItem>
 
+
         adapter = FilmsAdapter(
             LayoutInflater.from(requireContext()),
             list
@@ -68,8 +73,8 @@ class FilmsFragment : Fragment() {
             (activity as? OnFilmLikeClickListener)?.onFilmLikeClick(filmsItem, position, note)
         }
 
-        view.findViewById<RecyclerView>(R.id.id_recyclerView)
-            .adapter = adapter
+        rcv?.addItemDecoration(Decor(22))
+        rcv?.adapter = adapter
     }
 
     interface OnFilmLikeClickListener{

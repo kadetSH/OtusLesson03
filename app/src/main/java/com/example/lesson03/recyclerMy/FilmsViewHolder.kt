@@ -21,6 +21,7 @@ class FilmsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val colorFalse = ContextCompat.getColor(itemView.context, R.color.starFalse)
     var star = itemView.idStar
     var description = itemView.description
+
     fun bind(item: FilmsItem) {
 
         (itemView.nameFilm as TextView).text = item.nameFilm
@@ -30,6 +31,9 @@ class FilmsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         if (star.isSelected == true){
             star.setBackgroundColor(colorTrue)
+
+            var starAnim = android.view.animation.AnimationUtils.loadAnimation(star.context, R.anim.scale_star)
+            star.startAnimation(starAnim)
         }else star.setBackgroundColor(colorFalse)
 
     }
