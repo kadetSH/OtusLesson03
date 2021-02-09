@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fab.setOnClickListener {
             fabOnClickListener(it)
         }
-
         openFilmsList()
     }
 
