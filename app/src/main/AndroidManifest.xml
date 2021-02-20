@@ -16,19 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DescriptionActivity" />
-        <activity android:name=".SelectActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SENDTO" />
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <data android:scheme="sms" />-->
-                <data android:scheme="smsto" />
-                <data android:scheme="mailto" />
-            </intent-filter>
-
-
-        </activity>
     </application>
 
 </manifest>

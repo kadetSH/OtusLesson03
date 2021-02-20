@@ -1,61 +1,37 @@
 package com.example.lesson03
 
-
-
 import android.content.res.TypedArray
-import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.*
-import java.util.*
+import android.os.Bundle
+import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
+import androidx.core.view.GravityCompat
+import com.example.lesson03.recyclerMy.FilmsItem
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
 
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+    FilmsFragment.OnFilmLikeClickListener {
 
-class MainActivity : AppCompatActivity()  {
-
-    var adapter : MyAdapter? = null
-    var filmP : String = ""
-    private val TAG = "myLogs"
-    private val nameFilmPole by lazy {
-        findViewById<TextView>(R.id.nameFilm)
+    var list = ArrayList<FilmsItem>()
+    var filmP: String = ""
+    var favoriteName: ArrayList<String> = ArrayList()
+    var starSpisok = ArrayList<FilmsItem>()
+    var starSpisokPosition: ArrayList<Int> = ArrayList()
+    val fab by lazy {
+        findViewById<FloatingActionButton>(R.id.fab)
     }
-
-    val spisokFull by lazy {
-        findViewById<RecyclerView>(R.id.spisok)
-    }
+    var snackbar : Snackbar? = null
+    var selectItem: FilmsItem? = null
+    var selectItemAct : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setTitle("Фильмы")
-
-        //Получаем названия фильма после возвращения с описания
-        val name  = intent.getStringExtra("nameOfDescription")
-        name?.let {
-            filmP = it
-        }
-
-//        val comment  = intent.getStringExtra("comment")
-//        name?.let {
-//            filmP = it
-//        }
-
-        val like = intent.getStringExtra("like")
-        like?.let {
-            Log.d(TAG, like)
-        }
-        val comment = intent.getStringExtra("comment")
-        comment?.let {
-            Log.d(TAG, comment)
-        }
-
-
-
-        var list = ArrayList<SpisokItem>()
-        //массивы по фильмам отправляем в функцию для заполнения массива шаблонов
         list.addAll(
             fillArrays(
                 resources.getStringArray(R.array.film),
@@ -66,44 +42,183 @@ class MainActivity : AppCompatActivity()  {
             )
         )
 
-        findViewById<RecyclerView>(R.id.spisok).clearFindViewByIdCache()
-        findViewById<RecyclerView>(R.id.spisok).hasFixedSize()
-        findViewById<RecyclerView>(R.id.spisok).layoutManager = LinearLayoutManager(this)
-        adapter = MyAdapter(list, this)
-        spisokFull.adapter = adapter
+        id_navigation.setNavigationItemSelectedListener(this)
+        fab.setOnClickListener {
+            fabOnClickListener(it)
+        }
+        openFilmsList()
+    }
 
+
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.id_films -> openFilmsList()
+            R.id.id_favorites -> openFavorites()
+            R.id.id_films_add -> addFilm()
+            R.id.id_films_dell -> dellFilm()
+            R.id.id_invite -> Toast.makeText(this, "Нажали пригласить", Toast.LENGTH_SHORT).show()
+        }
+        id_drawerLayout.closeDrawer(GravityCompat.START)
+        return true
+    }
+
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        }else super.finish()
+    }
+
+    private fun fabOnClickListener(view: View){
+        val snackbar = Snackbar.make(view, "Our Snackbar", Snackbar.LENGTH_INDEFINITE)
+        snackbar.show()
+
+        view.postDelayed({
+            snackbar.dismiss()
+        }, 5000)
+    }
+
+
+    private fun openFilmsList() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer, FilmsFragment.newInstance(list))
+            .commit()
+    }
+
+    private fun openFavorites() {
+
+        if (starSpisok.size == 0) {
+            Toast.makeText(baseContext, "Нет помеченных фильмов", Toast.LENGTH_SHORT).show()
+        } else {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, FilmsFragment.newInstance(starSpisok))
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+
+    private fun openDescriptions(spisokItem: FilmsItem, position: Int) {
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer, FilmsDescriptionFragment.newInstance(spisokItem))
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun addFilm() {
+        var count = list.size
+        var spisokItem = FilmsItem(
+            "Добавили фильм $count",
+            R.drawable.ic_launcher_foreground,
+            "Описание добавленного фильма $count",
+            "",
+            false
+        )
+        list.add(spisokItem)
+        FilmsFragment.adapter?.notifyItemInserted(count)
+    }
+
+    private fun dellFilm() {
+        var count = list.size - 1
+        list.removeAt(count)
+        FilmsFragment.adapter?.notifyItemRemoved(count)
+    }
+
+    fun selectFavorites(spisokItem: FilmsItem, position: Int) {
+        selectItem = spisokItem
+        selectItemAct = "добавили"
+        var proverka: Boolean = false
+        if ((spisokItem.star == false) && (proverka == false)) {
+
+            proverka = true
+            spisokItem.star = true
+            starSpisok.add(list[position])
+            FilmsFragment.adapter?.notifyItemChanged(position)
+//            Toast.makeText(this, "${spisokItem.nameFilm} добавили в избранное", Toast.LENGTH_SHORT)
+//                .show()
+            snackbarShow(spisokItem.nameFilm, "добавили")
+        }
+        if ((spisokItem.star == true) && (proverka == false)) {
+            selectItem = spisokItem
+            selectItemAct = "удалили"
+            proverka = true
+            spisokItem.star = false
+//            Toast.makeText(this, "${spisokItem.nameFilm} удалили из избранного", Toast.LENGTH_SHORT)
+//                .show()
+            var pos = starSpisok.indexOf(spisokItem)
+            if (pos > -1) {
+                starSpisok.removeAt(pos)
+            }
+            FilmsFragment.adapter?.notifyDataSetChanged() //notifyItemChanged(position)
+            snackbarShow("${spisokItem.nameFilm}", "удалили")
+        }
+    }
+
+    fun snackbarShow(name : String, act : String){
+        val listener = View.OnClickListener {
+            println("")
+            if (selectItemAct.equals("добавили")){
+                selectItem?.star = false
+                var pos = starSpisok.indexOf(selectItem)
+                if (pos > -1) {
+                    starSpisok.removeAt(pos)
+                }
+                FilmsFragment.adapter?.notifyDataSetChanged()
+            }else{
+                selectItem?.star = true
+                selectItem?.let { it1 -> starSpisok.add(it1) }
+                FilmsFragment.adapter?.notifyDataSetChanged()
+            }
+
+        }
+        if (act.equals("добавили")) snackbar = Snackbar.make(fab, "$name - добавили в избранное", Snackbar.LENGTH_INDEFINITE)
+        if (act.equals("удалили")) snackbar = Snackbar.make(fab, "$name - удалили из избранного", Snackbar.LENGTH_INDEFINITE)
+        snackbar?.setAction("Отменить", listener )
+        snackbar?.show()
+        fab.postDelayed({
+            snackbar?.dismiss()
+        }, 3000)
     }
 
     fun fillArrays(
         titleArray: Array<String>,
         filmImageArray: IntArray,
-        descriptionArray: Array<String>
-    ) : List<SpisokItem>{
-        var list = ArrayList<SpisokItem>()
-        for (i in 0..titleArray.size-1){
+        descriptionArray: Array<String>,
+    ): List<FilmsItem> {
+        var list = ArrayList<FilmsItem>()
+        for (i in 0..titleArray.size - 1) {
             var shortDescription = descriptionArray[i]
             var proverka = ""
-            if (titleArray[i].equals(filmP)){
+            if (titleArray[i].equals(filmP)) {
                 proverka = filmP
             }
+            var idxFav = favoriteName.indexOf(titleArray[i])
+            var boolFavorite: Boolean
 
-            var spisokItem = SpisokItem(
+            if (idxFav == -1) {
+                boolFavorite = false
+            } else {
+                boolFavorite = true
+            }
+            var spisokItem = FilmsItem(
                 titleArray[i], filmImageArray[i], shortDescription.substring(
                     0,
                     120
-                ) + "...", proverka
+                ) + "...", proverka, boolFavorite
             )
             list.add(spisokItem)
         }
         return list
     }
 
-    //Расшифровка идентификаторов картинок. Получаем количество фильмов, циклом перебираем картинки и получаем их id
-    fun getImageId(filmImageArrayId: Int) : IntArray{
-        var iArray : TypedArray = resources.obtainTypedArray(filmImageArrayId)
+    fun getImageId(filmImageArrayId: Int): IntArray {
+        var iArray: TypedArray = resources.obtainTypedArray(filmImageArrayId)
         val count = iArray.length()
         val ids = IntArray(count)
-        for (i in ids.indices){
+        for (i in ids.indices) {
             ids[i] = iArray.getResourceId(i, 0)
         }
         iArray.recycle()
@@ -111,5 +226,12 @@ class MainActivity : AppCompatActivity()  {
     }
 
 
+    override fun onFilmLikeClick(filmsItem: FilmsItem, position: Int, note: String) {
+        if (note.equals("star")) {
+            selectFavorites(filmsItem, position)
+        } else if (note.equals("description")) {
+            openDescriptions(filmsItem, position)
+        }
+    }
 
 }
